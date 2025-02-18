@@ -4,7 +4,7 @@ export const tourData = {
       id: "scene1",
       name: "Sala",
       imageUrl:
-        "https://as1.ftcdn.net/v2/jpg/07/75/33/92/1000_F_775339245_gwdyxRPcOJ1DKK2HyidTqHkkUbZ8ILPZ.jpg",
+        "https://t4.ftcdn.net/jpg/03/95/23/69/360_F_395236908_JNQZeph1ONTyXEPypyyjd0tXBlvgBMsK.jpg",
       pois: [{ position: "1 1 -3", text: "Ir a Cuarto", sceneId: "scene2" }],
     },
     {
@@ -12,7 +12,7 @@ export const tourData = {
       name: "Cuarto",
       imageUrl:
         "https://as2.ftcdn.net/v2/jpg/04/74/58/17/1000_F_474581736_CKC2XvIQvZNH6hWE4hSdXDAoULpgMWWZ.jpg",
-      pois: [{ position: "-1 1 -3", text: "Ir a Bano", sceneId: "scene3" }],
+      pois: [{ position: "3 1 4", text: "Ir a Bano", sceneId: "scene3" }],
     },
     {
       id: "scene3",

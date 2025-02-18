@@ -1,76 +1,95 @@
 "use client";
-import { useEffect, useState, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { tourData } from "@/utils/tourData";
+import { Entity, Scene } from "aframe-react";
 import "aframe";
 import "aframe-extras";
 import "aframe-event-set-component";
 
 const VirtualTour = () => {
   const [currentScene, setCurrentScene] = useState(tourData.scenes[2]);
-  const skyRef = useRef(null);
+  const skyRef = useRef<HTMLDivElement | null>(null);
 
   const handleSceneChange = (sceneId: string) => {
+    console.log(sceneId);
     const nextScene = tourData.scenes.find((scene) => scene.id === sceneId);
-    if (nextScene) {
-      setCurrentScene(nextScene);
-    }
+    if (nextScene) setCurrentScene(nextScene);
   };
 
   useEffect(() => {
     if (skyRef.current) {
-      (skyRef.current as any).setAttribute("src", currentScene.imageUrl);
+      try {
+        const skyEl = skyRef.current as unknown as HTMLElement;
+        skyEl.setAttribute("src", "");
+        setTimeout(() => {
+          skyEl.setAttribute("src", currentScene.imageUrl);
+        }, 50); 
+      } catch (error) {}
     }
   }, [currentScene]);
 
   return (
-    <a-scene vr-mode-ui="enabled: true" xr-mode-ui="enabled: true">
-      <a-entity
+    <Scene vr-mode-ui="enabled: true" xr-mode-ui="enabled: true">
+      <Entity
         id="camera"
         camera
         position="0 1.6 0"
         look-controls
         wasd-controls
-        raycaster="objects: .clickable"
+        raycaster={{ objects: ".clickable" }}
       >
-        <a-entity
-          cursor="rayOrigin: mouse; fuse: true; fuseTimeout: 1000"
+        <Entity
+          cursor={{ rayOrigin: "mouse", fuse: true, fuseTimeout: 1000 }}
           position="0 0 -1"
-        ></a-entity>
-      </a-entity>
+        />
+      </Entity>
 
-      <a-entity
-        oculus-touch-controls="hand: left"
-        vive-controls="hand: left"
-        windows-motion-controls="hand: left"
+      <Entity
+        oculus-touch-controls={{ hand: "left" }}
         laser-controls
-        raycaster="objects: .clickable"
-      ></a-entity>
-
-      <a-entity
-        oculus-touch-controls="hand: right"
-        vive-controls="hand: right"
-        windows-motion-controls="hand: right"
+        raycaster={{ objects: ".clickable" }}
+      />
+      <Entity
+        oculus-touch-controls={{ hand: "right" }}
         laser-controls
-        raycaster="objects: .clickable"
-      ></a-entity>
+        raycaster={{ objects: ".clickable" }}
+      />
 
-      <a-sky ref={skyRef} src={currentScene.imageUrl}></a-sky>
+      <Entity
+        ref={skyRef}
+        key={currentScene.id}
+        primitive="a-sky"
+        src={currentScene.imageUrl}
+      />
 
       {currentScene.pois.map((poi, index) => (
-        <a-sphere
-          key={`poi ${index}`}
-          radius="0.25"
-          radius-tubular="0.2"
-          scale="1 1 1"
-          color="blue"
-          material="color: blue"
-          position={poi.position}
-          event-set__mouseenter="material.color: red"
-          event-set__mouseleave="material.color: blue"
-          event-set__click={() => handleSceneChange(poi.sceneId)}
-        ></a-sphere>
+        <>
+          <Entity
+            key={`poi-${index}-${poi.sceneId}`}
+            primitive="a-image"
+            radius="0.25"
+            scale="1 1 1"
+            src="https://i.ibb.co/Txj7YGJb/directions-arrows-3d-render-free-photo-removebg-preview.png"
+            position={poi.position}
+            event-set__mouseenter={{ "material.color": "blue" }}
+            event-set__mouseleave={{ "material.color": "white" }}
+            events={{
+              click: () => handleSceneChange(poi.sceneId),
+            }}
+          />
+          <Entity
+            primitive="a-text"
+            value={poi.text} // Nombre del POI
+            position="0 0.5 0" // Ajusta la posición del texto sobre la esfera
+            align="center"
+            scale="1.5 1.5 1.5"
+            color="white"
+            visible={true} // Inicialmente oculto
+            class="poi-text"
+          />
+        </>
       ))}
-    </a-scene>
+    </Scene>
   );
 };
 
